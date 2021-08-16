@@ -1,0 +1,32 @@
+{% extends 'portfolio/base.html' %}
+
+{% block content %}
+
+
+<div align="center">
+  <h1>Blog page</h1>
+
+  <!-- {{ blog_count | pluralize }} - правильное окончание в зависимости от окличества записей -->
+  <h2>Max has written {{ blog_count }} blog{{ blog_count | pluralize }}</h2>
+
+  {% for blog in blogs %}
+    <br>
+    <br>
+    <a href="{% url 'blog:detail' blog.id %}"><h3>{{ blog.title }}</h3></a>
+
+    <br>
+    <p>{{ blog.date | date:'F d Y H:i:s' }}</p>
+    <br>
+
+    <!-- striptags - прячет теги из описания -->
+    {{ blog.description | striptags | truncatechars:50 }}
+
+    {% if blog.url %}
+      <br>
+      <a href="{{ blog.url }}">Link</a>
+    {% endif %}
+
+  {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'portfolio/base.html' %}
+
+{% block content %}
+
+  <div align="center">
+    <h1>{{ blog.title }}</h1>
+    <h2>--{{ blog.date | date:'F jS Y' }}--</h2>
+    <br>
+    <!-- safe - применяет теги отображения из описания description -->
+    {{ blog.description | safe }}
+
+    
+    <p><a href="{% url 'blog:all_blogs' %}">Back to blogs</a></p>
+  </div>
+
+{% endblock %}

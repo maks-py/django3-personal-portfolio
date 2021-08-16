@@ -1,0 +1,53 @@
+{% extends 'portfolio/base.html' %}
+
+{% block content %}
+
+  {% load static %}
+
+  <br>
+  <div class="row justify-content-center">
+    <div class="col-4">
+      <img src="{% static 'portfolio/myfoto.jpg' %}" height='500' width='400'>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-5">
+      <h2>Maxim Pylaev is python programmer</h2>
+    </div>
+  </div>
+
+  <hr>
+  <nav class="navbar bg-warning p-2" style="--bs-bg-opacity: .7;">
+    <div class="container-fluid justify-content-center">
+      <span class="navbar-brand mb-0 h2">Projects</span>
+    </div>
+  </nav>
+
+  <div class="row">
+    {% for project in projects %}
+      <div class="col-lg-4 col-md-6">
+        <br>
+
+        <h3>{{ project.title }}</h3>
+
+        <div class="col-8">
+          {{ project.description }}
+        </div>
+
+
+        <br>
+        <a href="{{ project.url }}" target="_blank">
+          <img src = "{{ project.image.url }}" width="200" height="200">
+        </a>
+        <br>
+        <br>
+
+        {% if project.url %}
+          <a href="{{ project.url }}" class="btn btn-primary" target="_blank">Goto Project</a>
+        {% endif %} 
+      </div>
+    {% endfor %}
+  </div>
+
+{% endblock %}
