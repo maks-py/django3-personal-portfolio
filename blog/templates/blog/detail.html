@@ -9,8 +9,42 @@
     <!-- safe - применяет теги отображения из описания description -->
     {{ blog.description | safe }}
 
-    
     <p><a href="{% url 'blog:all_blogs' %}">Back to blogs</a></p>
   </div>
+
+  <hr>
+  {% for comment in comments %}
+    <div class="comments" style="padding: 10px;">
+      <p class="font-weight-bold">
+        <i>'{{ comment.name }}'</i> commented at 
+        <span class=" text-muted font-weight-normal">
+          {{ comment.created_on }}
+        </span>
+      </p>
+     <div class="mb-2 bg-light">
+        {{ comment.body | linebreaks }}
+      </div>
+    </div>
+  {% endfor %}
+
+   <hr>
+   <div class="container-lg">
+      <h5>Leave a comment</h5>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in comment_form %}
+          <div class="mb-3 form-floating">
+            <div class="mb-3 row">
+              <label for="tag" class="col-sm-2 col-form-label">{{ field.label_tag }}</label>
+              <div class="col-sm-3" id="tag">
+                {{ field }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Comment</button>
+      </form>
+  </div>
+
 
 {% endblock %}
