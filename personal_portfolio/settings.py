@@ -37,8 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #My apps
     'blog',
     'portfolio',
+
+    #3-rd party apps
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +75,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'personal_portfolio.wsgi.application'
-
+ASGI_APPLICATION = 'personal_portfolio.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

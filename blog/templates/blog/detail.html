@@ -13,38 +13,111 @@
   </div>
 
   <hr>
-  {% for comment in comments %}
-    <div class="comments" style="padding: 10px;">
-      <p class="font-weight-bold">
-        <i>'{{ comment.name }}'</i> commented at 
-        <span class=" text-muted font-weight-normal">
-          {{ comment.created_on }}
-        </span>
-      </p>
-     <div class="mb-2 bg-light">
-        {{ comment.body | linebreaks }}
+  <div id="comments-list">
+    {% for comment in comments %}
+      <div class="comments" style="padding: 10px;">
+        <p class="font-weight-bold">
+          <i>'{{ comment.name }}'</i> commented at 
+          <span class=" text-muted font-weight-normal">
+            {{ comment.created_on }}
+          </span>
+        </p>
+       <div class="mb-2 bg-light">
+          {{ comment.body | linebreaks }}
+        </div>
       </div>
-    </div>
-  {% endfor %}
+    {% endfor %}
+  </div>
 
-   <hr>
-   <div class="container-lg">
+  <hr>
+  <div class="container-lg">
+  <form method="post" id="comment-form">
+      {% csrf_token %}
       <h5>Leave a comment</h5>
-      <form method="post">
-        {% csrf_token %}
-        {% for field in comment_form %}
-          <div class="mb-3 form-floating">
-            <div class="mb-3 row">
-              <label for="tag" class="col-sm-2 col-form-label">{{ field.label_tag }}</label>
-              <div class="col-sm-3" id="tag">
-                {{ field }}
-              </div>
-            </div>
+      <br>
+      <div class="mb-3 form-floating">
+        <div class="mb-3 row">
+          <div class="col-sm-3">
+              {{ comment_form.name }}
           </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-primary">Comment</button>
-      </form>
+        </div>
+        <div class="mb-3 row">
+          <div class="col-sm-3">
+              {{ comment_form.body }}
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" id="send-comment">Comment</button>
+      <br>
+  </form>
   </div>
 
 
-{% endblock %}
+{% endblock content%}
+
+{% block js %}
+
+  <script>
+    const commentsSocket = new WebSocket(
+                                'ws://'
+                                + window.location.host
+                                + '/ws/blog/'
+                                + {{ blog.id }} + '/'
+                                )
+
+
+    /* Добавление созданного комментария в общий список */
+    commentsSocket.onmessage = function(e){
+    const data = JSON.parse(e.data);
+    /* console.log("onmessage created: " + data['message']['created_on']);
+    console.log("onmessage by: " + data['message']['name']);
+    console.log("onmessage body: " + data['message']['body']);*/
+    
+    commentsList = document.getElementById('comments-list')
+    commentsList.insertAdjacentHTML(
+        'beforeend',
+         '<div class="comments" style="padding: 10px;">\n' +
+         '<p class="font-weight-bold">\n' +
+          '<i>\'' + data['message']['name'] + '\'</i> commented at\n' + 
+          '<span class=" text-muted font-weight-normal">\n' + 
+           data['message']['created_on'] + 
+          '</span>\n' +
+          '</p>\n' + 
+         '<div class="mb-2 bg-light">\n' + 
+          data['message']['body'] + 
+          '</div>\n' + 
+          '</div>'
+        )
+    }
+
+
+    /* Отправка комментария по Enter */
+    document.querySelector('#body').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#send-comment').click();
+        }
+    };
+
+
+    /* Отправка комментария consumer'у с предварительной валидацией формы */
+    document.querySelector('#send-comment').onclick = function(e){
+      e.preventDefault()
+      const message = document.getElementById('body');
+      const name = document.getElementById('name');
+
+      const form = document.getElementById("comment-form");
+      const isValid = form.reportValidity();
+
+      if (isValid){
+        /*console.log("onclick: message " + message + 'by ' + name);*/
+        commentsSocket.send(JSON.stringify({
+          'message' : message.value,
+          'name' : name.value
+        }))
+
+        message.value = '';
+        name.value = '';
+      }
+    }
+  </script>
+{% endblock js %}
